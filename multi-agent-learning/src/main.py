@@ -1,9 +1,20 @@
 import argparse
 import sys
+from pathlib import Path
 
+from dotenv import load_dotenv
 from agents.basic_agent import BasicAgent
+from agents.planner_agent import PlannerAgent
 from config import resolve_provider_config
+from scheduler import DagScheduler, Dispatcher
 from storage.execution_store import ExecutionStore
+
+
+def load_env_file() -> None:
+    """Load environment variables from project .env file if present."""
+    project_root = Path(__file__).resolve().parents[1]
+    env_path = project_root / ".env"
+    load_dotenv(dotenv_path=env_path, override=False)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -27,6 +38,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--model",
         default=None,
         help="Override the provider default model name.",
+    )
+    parser.add_argument(
+        "--mode",
+        default="build",
+        choices=("build", "plan"),
+        help="Execution mode: build (run BasicAgent) or plan (run PlannerAgent).",
+    )
+    parser.add_argument(
+        "--planner-backend",
+        default="rule",
+        choices=("rule", "llm"),
+        help="Planner backend: rule or llm.",
     )
     parser.add_argument(
         "--base-url",
@@ -59,12 +82,63 @@ def main() -> int:
         sys.stderr.reconfigure(encoding="utf-8")
 
     # 统一解析命令行参数，后续新增 Planner / Dispatcher 时仍然沿用这里。
+    load_env_file()
     parser = build_parser()
     args = parser.parse_args()
 
     try:
         # ExecutionStore 负责把每次任务执行结果写入本地 JSON。
         store = ExecutionStore(args.store_path)
+
+        if args.mode == "plan":
+            planner_provider_config = None
+            if args.planner_backend == "llm":
+                planner_provider_config = resolve_provider_config(
+                    provider=args.provider,
+                    model_name=args.model,
+                    base_url=args.base_url,
+                )
+
+            planner = PlannerAgent(
+                store=store,
+                backend=args.planner_backend,
+                provider_config=planner_provider_config,
+            )
+            result = planner.run(args.task)
+            plan = result.metadata.get("plan", [])
+            assignments = Dispatcher().dispatch(plan)
+            schedule_result = DagScheduler().run(plan, assignments)
+
+            print("mode: plan")
+            print(f"planner_backend: {args.planner_backend}")
+            print(f"status: {result.status}")
+            print(f"plan_tasks: {len(plan)}")
+            if result.metadata.get("planner_debug", {}).get("fallback"):
+                print(f"fallback_reason: {result.metadata['planner_debug']['reason']}")
+            print("output:")
+            for item in plan:
+                print(
+                    f"- {item['id']} | {item['type']} | depends_on={item['depends_on']} | {item['title']}"
+                )
+            print()
+            print("dispatch:")
+            for item in assignments:
+                print(
+                    f"- {item['task_id']} -> {item['agent_name']} | type={item['task_type']} | depends_on={item['depends_on']}"
+                )
+            print()
+            print("schedule:")
+            for item in schedule_result["tasks"]:
+                print(
+                    f"- {item['id']} | status={item['status']} | depends_on={item['depends_on']} | {item['title']}"
+                )
+            print()
+            print("trace:")
+            for item in schedule_result["trace"]:
+                print(
+                    f"- {item['task_id']} | event={item['event']} | agent={item['agent_name']}"
+                )
+            return 0
 
         # 先根据 provider 解析模型配置。
         # 这样 BasicAgent 不需要关心环境变量细节，只关心“拿到什么配置”。

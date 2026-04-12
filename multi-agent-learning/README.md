@@ -89,6 +89,19 @@ py -3 -m pip install -r requirements.txt
 
 ## 配置环境变量
 
+程序启动时会自动读取项目根目录下的 `.env`（通过 `python-dotenv`）。
+你可以先复制一份模板：
+
+```bash
+cp .env.example .env
+```
+
+Windows PowerShell 可用：
+
+```powershell
+Copy-Item .env.example .env
+```
+
 ### 1. 使用 OpenAI
 
 ```bash

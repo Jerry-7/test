@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import traceback
 from typing import Any
 
 from agents.base_agent import BaseAgent
 from config import ModelProviderConfig
-from models.task import TaskExecution
 from storage.execution_store import ExecutionStore
-from utils.time_utils import utc_now_iso
 
 try:
     from langchain.agents import create_agent
@@ -30,8 +27,7 @@ class BasicAgent(BaseAgent):
     """
 
     def __init__(self, store: ExecutionStore, provider_config: ModelProviderConfig):
-        super().__init__(name="BasicAgent")
-        self.store = store
+        super().__init__(name="BasicAgent", store=store)
         self.provider_config = provider_config
         # system_prompt 用来固定 Agent 的角色与回答风格。
         # 后续你做多 Agent 时，不同角色最先分化的通常就是这里。
@@ -43,42 +39,14 @@ class BasicAgent(BaseAgent):
         # Agent 在初始化时构建，这样 run() 内部逻辑更聚焦于执行过程。
         self.agent = self._build_agent()
 
-    def run(self, task_text: str) -> TaskExecution:
-        """统一执行入口。
-
-        这里体现的是一个非常典型的 Agent 生命周期：
-        create execution -> running -> completed/failed -> persist
-        """
-        # 先创建执行对象，后续所有状态和结果都挂在这个对象上。
-        execution = TaskExecution.create(task_text=task_text, agent_name=self.name)
-        execution.started_at = utc_now_iso()
-        execution.status = "running"
-
-        # 记录请求时使用的模型名，便于后续做成本分析或问题排查。
-        execution.metadata["provider"] = self.provider_config.provider
-        execution.metadata["requested_model"] = self.provider_config.model_name
+    def _build_execution_metadata(self) -> dict[str, Any]:
+        metadata = {
+            "provider": self.provider_config.provider,
+            "requested_model": self.provider_config.model_name,
+        }
         if self.provider_config.base_url:
-            execution.metadata["base_url"] = self.provider_config.base_url
-
-        try:
-            # 真正的模型调用逻辑被收敛到 _handle_task()。
-            output, metadata = self._handle_task(task_text)
-            execution.output = output
-            execution.metadata.update(metadata)
-            execution.status = "completed"
-        except Exception as exc:
-            # Agent 内部捕获异常后，依然会把失败记录写盘。
-            # 这比直接崩溃更适合学习“可观测性”。
-            execution.status = "failed"
-            execution.error = f"{type(exc).__name__}: {exc}"
-            execution.output = ""
-            execution.traceback = traceback.format_exc()
-        finally:
-            # 不论成功还是失败，都记录结束时间并持久化。
-            execution.ended_at = utc_now_iso()
-            self.store.append(execution)
-
-        return execution
+            metadata["base_url"] = self.provider_config.base_url
+        return metadata
 
     def _handle_task(self, task_text: str) -> tuple[str, dict[str, Any]]:
         """处理单次任务。
