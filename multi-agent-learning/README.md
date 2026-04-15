@@ -1,5 +1,17 @@
 # Multi-Agent Learning
 
+## `.env` Auto Load
+
+项目启动时会自动读取项目根目录下的 `.env` 文件。
+
+推荐先复制一份模板：
+
+```bash
+copy .env.example .env
+```
+
+然后把密钥填入 `.env`，之后直接运行项目即可，不必每次手动设置环境变量。
+
 这是一个配合 `multi-agent-learning-plan.md` 使用的 Python 学习项目。
 
 当前已完成：
@@ -185,6 +197,7 @@ py -3 src/main.py --provider qwen --base-url https://dashscope-intl.aliyuncs.com
 
 - `BaseAgent`：统一 Agent 接口
 - `BasicAgent`：内部使用 LangChain `create_agent`
+- `PlannerAgent`：使用 LangChain 结构化输出生成 `plan.json`
 - `model_provider.py`：统一解析 `openai / openrouter / qwen / glm` 配置
 - `Task` / `TaskExecution`：任务与执行记录模型
 - `ExecutionStore`：把执行记录持久化到本地 JSON
@@ -195,8 +208,45 @@ py -3 src/main.py --provider qwen --base-url https://dashscope-intl.aliyuncs.com
 1. 看 `src/main.py`，理解 CLI 参数如何进入系统
 2. 看 `src/config/model_provider.py`，理解不同提供方如何统一配置
 3. 看 `src/agents/basic_agent.py`，理解 LangChain Agent 如何创建和调用
-4. 看 `src/models/task.py` 和 `src/storage/execution_store.py`，理解执行记录如何落盘
-5. 运行一次后打开 `data/executions/executions.json`，观察任务轨迹
+4. 看 `src/agents/planner_agent.py`，理解结构化输出如何生成任务计划
+5. 看 `src/models/task.py`、`src/models/plan_task.py` 和 `src/storage/execution_store.py`
+6. 运行一次后打开 `data/executions/executions.json` 或 `data/plans/plan.json`
+
+## Planner 运行方式
+
+```bash
+py -3 src/main.py --agent planner --provider openai --task "我想通过项目学习多 Agent 调度"
+```
+
+自定义计划保存路径：
+
+```bash
+py -3 src/main.py --agent planner --provider qwen --plan-path data/plans/my-plan.json --task "学习 LangChain 多 Agent"
+```
+
+关闭 Qwen thinking 模式：
+
+```bash
+py -3 src/main.py --agent planner --provider qwen --thinking off --task "解释多 Agent 调度"
+```
+
+参数说明：
+
+- `--thinking default`：不显式传递 thinking 配置
+- `--thinking on`：对 `qwen` 传递 `enable_thinking=true`
+- `--thinking off`：对 `qwen` 传递 `enable_thinking=false`
+
+如果 `qwen` 在 `--thinking default` 下运行结构化输出时报：
+
+```text
+tool_choice parameter does not support being set to required or object in thinking mode
+```
+
+说明当前模型进入了 thinking mode，而 LangChain 结构化输出会使用工具调用。此时显式加上：
+
+```bash
+--thinking off
+```
 
 ## 学习提醒
 

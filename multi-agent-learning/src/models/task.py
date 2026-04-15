@@ -1,7 +1,23 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from typing import Any, TypedDict, cast
 from uuid import uuid4
+
+from models.plan_constants import TASK_STATUS_PENDING, TaskState
+
+
+class TaskExecutionRecord(TypedDict):
+    task_id: str
+    task_text: str
+    agent_name: str
+    status: TaskState
+    output: str
+    error: str
+    traceback: str
+    started_at: str
+    ended_at: str
+    metadata: dict[str, Any]
 
 
 @dataclass
@@ -22,7 +38,7 @@ class TaskExecution:
     # agent_name 用于追踪“是谁执行了这个任务”。
     agent_name: str
     # status 反映执行生命周期，后续多 Agent 调度会更依赖它。
-    status: str = "pending"
+    status: TaskState = TASK_STATUS_PENDING
     # output 保存模型的正常输出。
     output: str = ""
     # error 保存简短错误信息，适合直接展示。
@@ -33,7 +49,7 @@ class TaskExecution:
     started_at: str = ""
     ended_at: str = ""
     # metadata 存储额外信息，例如模型名、token 使用量、finish_reason。
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def create(cls, task_text: str, agent_name: str) -> "TaskExecution":
@@ -44,6 +60,6 @@ class TaskExecution:
             agent_name=agent_name,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> TaskExecutionRecord:
         """转成可序列化字典，便于写入 JSON。"""
-        return asdict(self)
+        return cast(TaskExecutionRecord, asdict(self))

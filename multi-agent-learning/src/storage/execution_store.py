@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import cast
 
-from models.task import TaskExecution
+from models.task import TaskExecution, TaskExecutionRecord
 
 
 class ExecutionStore:
@@ -31,7 +32,7 @@ class ExecutionStore:
             encoding="utf-8",
         )
 
-    def load_all(self) -> list[dict]:
+    def load_all(self) -> list[TaskExecutionRecord]:
         """读取全部执行记录。"""
         if not self.file_path.exists():
             return []
@@ -41,4 +42,4 @@ class ExecutionStore:
         if not content:
             return []
 
-        return json.loads(content)
+        return cast(list[TaskExecutionRecord], json.loads(content))

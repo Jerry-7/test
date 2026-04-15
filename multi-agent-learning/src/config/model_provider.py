@@ -35,6 +35,38 @@ class ModelProviderConfig:
     default_headers: dict[str, str] = field(default_factory=dict)
 
 
+def build_chat_model_kwargs(
+    provider_config: ModelProviderConfig,
+    *,
+    thinking_mode: str = "default",
+) -> dict[str, object]:
+    """构建 `ChatOpenAI` 需要的通用参数。
+
+    `thinking_mode` 当前只对 `provider=qwen` 生效：
+    - `default`: 不显式传递 thinking 配置
+    - `on`: `extra_body={"enable_thinking": True}`
+    - `off`: `extra_body={"enable_thinking": False}`
+    """
+
+    model_kwargs: dict[str, object] = {
+        "model": provider_config.model_name,
+        "api_key": provider_config.api_key,
+        "temperature": 0,
+        "stream_usage": True,
+    }
+    if provider_config.base_url:
+        model_kwargs["base_url"] = provider_config.base_url
+    if provider_config.default_headers:
+        model_kwargs["default_headers"] = provider_config.default_headers
+
+    if provider_config.provider == "qwen" and thinking_mode in {"on", "off"}:
+        model_kwargs["extra_body"] = {
+            "enable_thinking": thinking_mode == "on"
+        }
+
+    return model_kwargs
+
+
 # 这些预设让项目可以在“同一个 LangChain 入口”下切换不同服务商。
 # 当前阶段我们统一通过 OpenAI 兼容接口接入。
 PROVIDER_PRESETS: dict[str, ProviderPreset] = {
@@ -143,4 +175,3 @@ def _build_default_headers(provider: str) -> dict[str, str]:
         headers["X-OpenRouter-Title"] = openrouter_title
 
     return headers
-

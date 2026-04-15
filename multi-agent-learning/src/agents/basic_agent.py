@@ -4,7 +4,12 @@ import traceback
 from typing import Any
 
 from agents.base_agent import BaseAgent
-from config import ModelProviderConfig
+from config import ModelProviderConfig, build_chat_model_kwargs
+from models.plan_constants import (
+    TASK_STATUS_COMPLETED,
+    TASK_STATUS_FAILED,
+    TASK_STATUS_RUNNING,
+)
 from models.task import TaskExecution
 from storage.execution_store import ExecutionStore
 from utils.time_utils import utc_now_iso
@@ -29,10 +34,16 @@ class BasicAgent(BaseAgent):
     - 执行记录如何被落盘
     """
 
-    def __init__(self, store: ExecutionStore, provider_config: ModelProviderConfig):
+    def __init__(
+        self,
+        store: ExecutionStore,
+        provider_config: ModelProviderConfig,
+        thinking_mode: str = "default",
+    ):
         super().__init__(name="BasicAgent")
         self.store = store
         self.provider_config = provider_config
+        self.thinking_mode = thinking_mode
         # system_prompt 用来固定 Agent 的角色与回答风格。
         # 后续你做多 Agent 时，不同角色最先分化的通常就是这里。
         self.system_prompt = (
@@ -52,11 +63,12 @@ class BasicAgent(BaseAgent):
         # 先创建执行对象，后续所有状态和结果都挂在这个对象上。
         execution = TaskExecution.create(task_text=task_text, agent_name=self.name)
         execution.started_at = utc_now_iso()
-        execution.status = "running"
+        execution.status = TASK_STATUS_RUNNING
 
         # 记录请求时使用的模型名，便于后续做成本分析或问题排查。
         execution.metadata["provider"] = self.provider_config.provider
         execution.metadata["requested_model"] = self.provider_config.model_name
+        execution.metadata["thinking_mode"] = self.thinking_mode
         if self.provider_config.base_url:
             execution.metadata["base_url"] = self.provider_config.base_url
 
@@ -65,11 +77,11 @@ class BasicAgent(BaseAgent):
             output, metadata = self._handle_task(task_text)
             execution.output = output
             execution.metadata.update(metadata)
-            execution.status = "completed"
+            execution.status = TASK_STATUS_COMPLETED
         except Exception as exc:
             # Agent 内部捕获异常后，依然会把失败记录写盘。
             # 这比直接崩溃更适合学习“可观测性”。
-            execution.status = "failed"
+            execution.status = TASK_STATUS_FAILED
             execution.error = f"{type(exc).__name__}: {exc}"
             execution.output = ""
             execution.traceback = traceback.format_exc()
@@ -108,17 +120,10 @@ class BasicAgent(BaseAgent):
 
         # temperature=0 让输出尽量稳定，适合学习阶段观察行为。
         # stream_usage=True 让响应里尽可能带上 token 使用信息。
-        model_kwargs: dict[str, Any] = {
-            "model": self.provider_config.model_name,
-            "api_key": self.provider_config.api_key,
-            "temperature": 0,
-            "stream_usage": True,
-        }
-        if self.provider_config.base_url:
-            model_kwargs["base_url"] = self.provider_config.base_url
-        if self.provider_config.default_headers:
-            model_kwargs["default_headers"] = self.provider_config.default_headers
-
+        model_kwargs = build_chat_model_kwargs(
+            self.provider_config,
+            thinking_mode=self.thinking_mode,
+        )
         model = ChatOpenAI(**model_kwargs)
         return create_agent(
             model=model,
