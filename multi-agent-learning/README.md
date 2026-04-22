@@ -33,12 +33,33 @@ set DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/multi_agent_l
 set OPENAI_API_KEY=your_openai_api_key
 ```
 
+6. 可选：也可以把配置写到 JSON（不想配环境变量时使用）
+
+```bash
+mkdir config
+```
+
+创建 `config/runtime.json`：
+
+```json
+{
+  "database_url": "postgresql+psycopg://user:password@localhost:5432/multi_agent_learning"
+}
+```
+
+7. 首次使用先初始化表结构（当前版本未接入自动迁移）：
+
+```bash
+set PYTHONPATH=src
+py -3 -c "from pathlib import Path; from sqlalchemy import create_engine; from storage.db.models import Base; import json, os; url=os.getenv('DATABASE_URL','').strip(); cfg=Path('config/runtime.json'); url=url or (json.loads(cfg.read_text(encoding='utf-8')).get('database_url','').strip() if cfg.exists() else ''); engine=create_engine(url, future=True); Base.metadata.create_all(engine); engine.dispose(); print('tables created')"
+```
+
 ## 常用命令
 
 ### 1) 生成计划（planner）
 
 ```bash
-py -3 src/main.py --agent planner --provider openai --database-url postgresql+psycopg://user:password@localhost:5432/multi_agent_learning --task "学习多 Agent 调度"
+py -3 src/main.py --agent planner --provider openai --task "学习多 Agent 调度"
 ```
 
 输出中会包含 `plan_id`。
@@ -46,13 +67,13 @@ py -3 src/main.py --agent planner --provider openai --database-url postgresql+ps
 ### 2) 执行计划（run-plan）
 
 ```bash
-py -3 src/main.py --agent run-plan --provider openai --database-url postgresql+psycopg://user:password@localhost:5432/multi_agent_learning --plan-id <plan_id> --max-workers 2
+py -3 src/main.py --agent run-plan --provider openai --plan-id <plan_id> --max-workers 2
 ```
 
 ### 3) 单任务执行（basic）
 
 ```bash
-py -3 src/main.py --agent basic --provider openai --database-url postgresql+psycopg://user:password@localhost:5432/multi_agent_learning --task "解释多 Agent 调度流程"
+py -3 src/main.py --agent basic --provider openai --task "解释多 Agent 调度流程"
 ```
 
 ## Provider

@@ -1,7 +1,9 @@
 import argparse
+import json
 import os
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 from agents.basic_agent import BasicAgent
 from agents.planner_agent import PlannerAgent
@@ -91,7 +93,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--database-url",
         default=None,
-        help="Database URL used by ExecutionStore/PlanRepository/PlanRunRepository.",
+        help=(
+            "Optional database URL override. "
+            "Default uses DATABASE_URL env or runtime JSON config."
+        ),
+    )
+    parser.add_argument(
+        "--runtime-config",
+        default="config/runtime.json",
+        help=(
+            "Runtime JSON config path (optional). "
+            "Supports key `database_url`."
+        ),
     )
     parser.add_argument(
         "--plan-path",
@@ -322,7 +335,39 @@ def _build_plan_runner(
     )
 
 
-def _resolve_database_url(database_url: str | None) -> str:
+def _load_runtime_config(config_path: str | None) -> dict:
+    cleaned = (config_path or "").strip()
+    if not cleaned:
+        return {}
+
+    raw_path = Path(cleaned)
+    if raw_path.is_absolute():
+        resolved_path = raw_path
+    else:
+        cwd_candidate = Path.cwd() / raw_path
+        if cwd_candidate.exists():
+            resolved_path = cwd_candidate
+        else:
+            project_root = Path(__file__).resolve().parents[1]
+            resolved_path = project_root / raw_path
+
+    if not resolved_path.exists():
+        return {}
+
+    content = resolved_path.read_text(encoding="utf-8").strip()
+    if not content:
+        return {}
+
+    data = json.loads(content)
+    if not isinstance(data, dict):
+        raise ValueError("runtime config must be a JSON object.")
+    return data
+
+
+def _resolve_database_url(
+    database_url: str | None,
+    runtime_config_path: str | None = None,
+) -> str:
     cleaned_database_url = (database_url or "").strip()
     if cleaned_database_url:
         return cleaned_database_url
@@ -331,10 +376,20 @@ def _resolve_database_url(database_url: str | None) -> str:
     if env_database_url:
         return env_database_url
 
-    raise RuntimeError(
-        "DATABASE_URL is required. "
-        "Pass --database-url or set DATABASE_URL."
+    runtime_config = _load_runtime_config(runtime_config_path)
+    raw_config_database_url = (
+        runtime_config.get("database_url")
+        or runtime_config.get("DATABASE_URL")
     )
+    config_database_url = (
+        raw_config_database_url.strip()
+        if isinstance(raw_config_database_url, str)
+        else ""
+    )
+    if config_database_url:
+        return config_database_url
+
+    return ""
 
 
 def build_runtime(args: argparse.Namespace) -> RuntimeContext:
@@ -350,7 +405,10 @@ def build_runtime(args: argparse.Namespace) -> RuntimeContext:
         model_name=args.model,
         base_url=args.base_url,
     )
-    database_url = _resolve_database_url(args.database_url)
+    database_url = _resolve_database_url(
+        args.database_url,
+        getattr(args, "runtime_config", None),
+    )
     session_factory = create_session_factory(database_url)
 
     store = ExecutionStore(
