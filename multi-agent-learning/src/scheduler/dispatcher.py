@@ -6,6 +6,13 @@ from models.plan_task import PlanTask
 
 
 class Dispatcher:
+    """任务分发器。
+
+    作用：
+    - 维护 `task_type -> agent` 映射
+    - 根据任务类型选择对应执行 Agent
+    """
+
     def __init__(self):
         self._agents: dict[TaskType, BaseAgent] = {}
 

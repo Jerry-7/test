@@ -15,8 +15,8 @@ class PlanTask(BaseModel):
     """阶段 2 的结构化计划任务。"""
 
 
-    id: str = Field(description="任务唯一标识，例如 task-1")
-    title: str = Field(description="任务名称")
+    id: str = Field(min_length=1, description="任务唯一标识，例如 task-1")
+    title: str = Field(min_length=1, description="任务名称")
     type: TaskType = Field(
         description=f"任务类型，只使用 {', '.join(TASK_TYPES)}"
     )

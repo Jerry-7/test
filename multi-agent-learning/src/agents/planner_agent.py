@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-import json
-from pathlib import Path
+import os
+import warnings
 
-from agents.base_agent import BaseAgent
 from config import ModelProviderConfig, build_chat_model_kwargs
 from models.plan_constants import TASK_STATUS_PENDING, TASK_TYPES
 from models.plan_task import PlanResult, PlanTask
+from models.planner_run_result import PlannerRunResult
+from storage.db.session import create_session_factory
+from storage.repositories.plan_repository import PlanRepository
 
 try:
     from langchain.agents import create_agent
@@ -18,20 +20,17 @@ except ImportError:
     ChatOpenAI = None
 
 
-class PlannerAgent(BaseAgent):
-    """阶段 2 的 LangChain 版 PlannerAgent。
-
-    目标是把复杂学习目标转换成结构化计划，并保存为 `plan.json`。
-    """
-
+class PlannerAgent:
     def __init__(
         self,
         provider_config: ModelProviderConfig,
         thinking_mode: str = "default",
+        plan_repository: PlanRepository | None = None,
     ):
-        super().__init__(name="PlannerAgent")
+        self.name = "PlannerAgent"
         self.provider_config = provider_config
         self.thinking_mode = thinking_mode
+        self.plan_repository = plan_repository or self._build_default_plan_repository()
         self.system_prompt = (
             "你是一个计划者。"
             "请把用户的任务拆成 1 到 5 个清晰、循序渐进的任务。"
@@ -49,18 +48,29 @@ class PlannerAgent(BaseAgent):
     def run(
         self,
         goal: str,
-        path: str = "data/plans/plan.json",
-    ) -> list[PlanTask]:
+        path: str | None = None,
+    ) -> PlannerRunResult:
+        if path:
+            warnings.warn(
+                "`path` is deprecated in db-only mode and is ignored. "
+                "Use database persistence with plan_id instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+
         cleaned_goal = goal.strip()
         if not cleaned_goal:
             raise ValueError("Goal cannot be empty.")
 
-        try:
-            plan = self._handle_goal(cleaned_goal)
-            self.save_plan(plan, path=path)
-            return plan
-        except Exception as exc:
-            raise RuntimeError(f"PlannerAgent failed: {exc}") from exc
+        plan = self._handle_goal(cleaned_goal)
+        plan_id = self.plan_repository.save_plan(
+            goal=cleaned_goal,
+            provider=self.provider_config.provider,
+            model_name=self.provider_config.model_name,
+            thinking_mode=self.thinking_mode,
+            tasks=plan,
+        )
+        return PlannerRunResult(plan_id=plan_id, tasks=tuple(plan))
 
     def _handle_goal(self, goal: str) -> list[PlanTask]:
         response = self.agent.invoke(
@@ -96,18 +106,11 @@ class PlannerAgent(BaseAgent):
             response_format=ToolStrategy(PlanResult),
         )
 
-    def save_plan(
-        self,
-        plan: list[PlanTask],
-        path: str = "data/plans/plan.json",
-    ) -> None:
-        file_path = Path(path)
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(
-            json.dumps(
-                [task.model_dump() for task in plan],
-                ensure_ascii=False,
-                indent=2,
-            ),
-            encoding="utf-8",
-        )
+    def _build_default_plan_repository(self) -> PlanRepository:
+        database_url = os.getenv("DATABASE_URL", "").strip()
+        if not database_url:
+            raise RuntimeError(
+                "PlannerAgent requires plan_repository or DATABASE_URL."
+            )
+        session_factory = create_session_factory(database_url)
+        return PlanRepository(session_factory=session_factory)

@@ -5,6 +5,7 @@ from typing import Any
 
 from agents.base_agent import BaseAgent
 from config import ModelProviderConfig, build_chat_model_kwargs
+from models.agent_task import AgentTask
 from models.plan_constants import (
     TASK_STATUS_COMPLETED,
     TASK_STATUS_FAILED,
@@ -34,31 +35,60 @@ class BasicAgent(BaseAgent):
     - 执行记录如何被落盘
     """
 
+    DEFAULT_SYSTEM_PROMPT = (
+        "你是一个帮助用户学习多 Agent 调度的 Python 学习助手。"
+        "请用清晰、结构化、适合初学者的方式回答。"
+        "优先解释任务目标、关键组成、执行流程和下一步建议。"
+    )
+
     def __init__(
         self,
         store: ExecutionStore,
         provider_config: ModelProviderConfig,
         thinking_mode: str = "default",
+        name: str = "BasicAgent",
+        system_prompt: str | None = None,
     ):
-        super().__init__(name="BasicAgent")
+        """初始化基础 Agent。
+
+        参数：
+        - store: 执行记录存储器，用于落盘 TaskExecution。
+        - provider_config: 模型提供方配置（model/api_key/base_url）。
+        - thinking_mode: 推理模式开关（主要给兼容 provider 使用）。
+        - name: Agent 名称，写入执行记录。
+        - system_prompt: 可覆盖默认系统提示词。
+        """
+        super().__init__(name=name)
         self.store = store
         self.provider_config = provider_config
         self.thinking_mode = thinking_mode
         # system_prompt 用来固定 Agent 的角色与回答风格。
         # 后续你做多 Agent 时，不同角色最先分化的通常就是这里。
-        self.system_prompt = (
-            "你是一个帮助用户学习多 Agent 调度的 Python 学习助手。"
-            "请用清晰、结构化、适合初学者的方式回答。"
-            "优先解释任务目标、关键组成、执行流程和下一步建议。"
-        )
+        self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         # Agent 在初始化时构建，这样 run() 内部逻辑更聚焦于执行过程。
         self.agent = self._build_agent()
 
     def run(self, task_text: str) -> TaskExecution:
-        """统一执行入口。
+        """普通字符串输入给Agent的任务。
 
-        这里体现的是一个非常典型的 Agent 生命周期：
+        典型的 Agent 生命周期：
         create execution -> running -> completed/failed -> persist
+        """
+        cleaned = task_text.strip()
+        if not cleaned:
+            raise ValueError("Task text cannot be empty.")
+
+        return self._execute(
+            task_text=cleaned,
+            agent_input=self.build_task_input(cleaned),
+        )
+
+    def _execute(self, task_text: str, agent_input: str) -> TaskExecution:
+        """执行统一生命周期并落盘结果。
+
+        参数：
+        - task_text: 用于记录的任务文本（强调“任务语义”）。
+        - agent_input: 实际发送给模型的输入文本（可包含增强上下文）。
         """
         # 先创建执行对象，后续所有状态和结果都挂在这个对象上。
         execution = TaskExecution.create(task_text=task_text, agent_name=self.name)
@@ -74,7 +104,7 @@ class BasicAgent(BaseAgent):
 
         try:
             # 真正的模型调用逻辑被收敛到 _handle_task()。
-            output, metadata = self._handle_task(task_text)
+            output, metadata = self._handle_task(agent_input)
             execution.output = output
             execution.metadata.update(metadata)
             execution.status = TASK_STATUS_COMPLETED
@@ -92,23 +122,55 @@ class BasicAgent(BaseAgent):
 
         return execution
 
-    def _handle_task(self, task_text: str) -> tuple[str, dict[str, Any]]:
+    def run_agent_task(self, agent_task: AgentTask) -> TaskExecution:
+        """执行结构化任务入口。
+
+        这里会先校验并构建 `agent_input`，再进入统一执行流程 `_execute`。
+        """
+        rendered_task = agent_task.rendered_task.strip()
+        if not rendered_task:
+            raise ValueError("Task text cannot be empty.")
+
+        agent_input = self.build_agent_task_input(agent_task).strip()
+        if not agent_input:
+            raise ValueError("Task input cannot be empty.")
+
+        return self._execute(
+            task_text=rendered_task,
+            agent_input=agent_input,
+        )
+
+    def _handle_task(self, agent_input: str) -> tuple[str, dict[str, Any]]:
         """处理单次任务。
 
         返回值拆成两部分：
         - output: 给用户展示的文本
         - metadata: usage、model_name、finish_reason 等辅助信息
         """
-        cleaned = task_text.strip()
+        cleaned = agent_input.strip()
         if not cleaned:
             raise ValueError("Task text cannot be empty.")
 
-        # LangChain v1 常见调用方式之一：传入 messages。
         # 这里先用最简单的 user message，不引入复杂上下文。
         response = self.agent.invoke(
             {"messages": [{"role": "user", "content": cleaned}]}
         )
         return self._extract_text(response), self._extract_metadata(response)
+
+    # 普通文本 输入给agent
+    def build_task_input(self, task_text: str) -> str:
+        """构建普通文本任务的模型输入。
+
+        当前实现为直传，子类可覆盖做统一包装。
+        """
+        return task_text
+
+    def build_agent_task_input(self, agent_task: AgentTask) -> str:
+        """构建结构化任务的模型输入。
+
+        默认使用 `AgentTask.rendered_task`，子类可覆写加入角色化提示。
+        """
+        return self.build_task_input(agent_task.rendered_task)
 
     def _build_agent(self):
         """构建 LangChain Agent 实例。"""

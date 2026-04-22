@@ -8,6 +8,13 @@ from models.plan_constants import TASK_STATUS_PENDING, TaskState
 
 
 class TaskExecutionRecord(TypedDict):
+    """执行记录的序列化结构。
+
+    作用：
+    - 约束写入 JSON 时的字段形状
+    - 作为 `TaskExecution.to_dict()` 的类型契约
+    """
+
     task_id: str
     task_text: str
     agent_name: str
