@@ -65,3 +65,56 @@ class PlanRepository:
                 )
                 for row in rows
             ]
+
+    def list_plans(self, limit: int = 20) -> list[dict[str, object]]:
+        with self._session_factory() as session:
+            rows = (
+                session.query(PlanRow)
+                .order_by(PlanRow.created_at.desc())
+                .limit(limit)
+                .all()
+            )
+            return [
+                {
+                    "plan_id": str(row.plan_id),
+                    "source_goal": row.source_goal,
+                    "provider": row.provider,
+                    "model_name": row.model_name,
+                    "thinking_mode": row.thinking_mode,
+                    "created_at": row.created_at.isoformat(),
+                }
+                for row in rows
+            ]
+
+    def get_plan_summary(self, plan_id: str) -> dict[str, object]:
+        with self._session_factory() as session:
+            plan_row = (
+                session.query(PlanRow)
+                .filter(PlanRow.plan_id == UUID(plan_id))
+                .one()
+            )
+            task_rows = (
+                session.query(PlanTaskRow)
+                .filter(PlanTaskRow.plan_id == UUID(plan_id))
+                .order_by(PlanTaskRow.priority.asc(), PlanTaskRow.task_id.asc())
+                .all()
+            )
+            return {
+                "plan_id": str(plan_row.plan_id),
+                "source_goal": plan_row.source_goal,
+                "provider": plan_row.provider,
+                "model_name": plan_row.model_name,
+                "thinking_mode": plan_row.thinking_mode,
+                "created_at": plan_row.created_at.isoformat(),
+                "tasks": [
+                    {
+                        "task_id": row.task_id,
+                        "title": row.title,
+                        "type": row.type,
+                        "priority": row.priority,
+                        "status": row.status,
+                        "depends_on": list(row.depends_on),
+                    }
+                    for row in task_rows
+                ],
+            }

@@ -3,3 +3,5 @@ __pycache__/
 .env
 data/executions/executions.json
 .worktrees/
+console/node_modules/
+console/dist/

@@ -104,3 +104,27 @@ data/
 set TEST_DATABASE_URL=postgresql+psycopg://postgres:123456@localhost:5432/postgres
 py -3 -m pytest tests/storage/test_db_models.py tests/storage/test_execution_repository.py tests/storage/test_plan_repository.py tests/storage/test_plan_run_repository.py tests/scheduler/test_plan_runner_persistence.py tests/storage/test_cli_contract.py -q
 ```
+
+## Operations Console
+
+Start the API:
+
+```bash
+set PYTHONPATH=src
+py -3 -m uvicorn console_api.app:app --reload --port 8000
+```
+
+Start the UI:
+
+```bash
+cmd /c npm --prefix console install
+cmd /c npm --prefix console run dev
+```
+
+The console currently supports:
+
+- create plan
+- start run
+- inspect runs and task state
+- retry a run as a new run
+- view pause/cancel as unsupported control placeholders

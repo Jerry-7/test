@@ -231,7 +231,11 @@ class PlanRunner:
         plan_tasks = self.load_plan(path)
         return self.run(plan_tasks)
 
-    def run_from_plan_id(self, plan_id: str) -> list[TaskExecution]:
+    def run_from_plan_id(
+        self,
+        plan_id: str,
+        run_id: str | None = None,
+    ) -> list[TaskExecution]:
         if self.plan_repository is None:
             raise RuntimeError("PlanRunner requires plan_repository for run_from_plan_id.")
         if self.plan_run_repository is None:
@@ -240,18 +244,18 @@ class PlanRunner:
             )
 
         plan_tasks = self.plan_repository.load_plan(plan_id)
-        run_id = self.plan_run_repository.create_run(
+        resolved_run_id = run_id or self.plan_run_repository.create_run(
             plan_id=plan_id,
             max_workers=self.max_workers,
             started_at=self._utc_now_iso(),
         )
         previous_run_id = self._active_run_id
-        self._active_run_id = run_id
+        self._active_run_id = resolved_run_id
         try:
             executions = self.run(plan_tasks)
         except Exception:
             self.plan_run_repository.finish_run(
-                run_id=run_id,
+                run_id=resolved_run_id,
                 status=TASK_STATUS_FAILED,
                 ended_at=self._utc_now_iso(),
             )
@@ -263,7 +267,7 @@ class PlanRunner:
                 else TASK_STATUS_COMPLETED
             )
             self.plan_run_repository.finish_run(
-                run_id=run_id,
+                run_id=resolved_run_id,
                 status=final_status,
                 ended_at=self._utc_now_iso(),
             )

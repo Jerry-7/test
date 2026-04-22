@@ -60,12 +60,10 @@ def test_run_plan_uses_plan_id_only():
 
 def test_build_runtime_injects_db_repositories_for_run_plan(monkeypatch):
     created: dict[str, object] = {}
-    session_factory_calls: list[str] = []
-
-    monkeypatch.setattr(
-        main,
-        "resolve_provider_config",
-        lambda **_: SimpleNamespace(provider="openai", model_name="gpt-x"),
+    service_context = SimpleNamespace(
+        provider_config=SimpleNamespace(provider="openai", model_name="gpt-x"),
+        session_factory="session-factory:postgresql://db.example/app",
+        database_url="postgresql://db.example/app",
     )
 
     class _FakeExecutionStore:
@@ -84,14 +82,7 @@ def test_build_runtime_injects_db_repositories_for_run_plan(monkeypatch):
             created["plan_run_repository"] = self
 
     monkeypatch.setattr(main, "ExecutionStore", _FakeExecutionStore)
-    monkeypatch.setattr(
-        main,
-        "create_session_factory",
-        lambda database_url: (
-            session_factory_calls.append(database_url)
-            or f"session-factory:{database_url}"
-        ),
-    )
+    monkeypatch.setattr(main, "build_service_context", lambda **_: service_context)
     monkeypatch.setattr(main, "PlanRepository", _FakePlanRepository)
     monkeypatch.setattr(main, "PlanRunRepository", _FakePlanRunRepository)
     monkeypatch.setattr(
@@ -146,39 +137,29 @@ def test_build_runtime_injects_db_repositories_for_run_plan(monkeypatch):
         "plan_repository": created["plan_repository"],
         "plan_run_repository": created["plan_run_repository"],
     }
-    assert created["plan_repository"].session_factory == (
-        "session-factory:postgresql://db.example/app"
-    )
-    assert created["plan_run_repository"].session_factory == (
-        "session-factory:postgresql://db.example/app"
-    )
-    assert session_factory_calls == ["postgresql://db.example/app"]
+    assert created["plan_repository"].session_factory == service_context.session_factory
+    assert created["plan_run_repository"].session_factory == service_context.session_factory
 
 
-def test_build_runtime_uses_database_url_from_env(monkeypatch):
-    created: dict[str, object] = {}
-    session_factory_calls: list[str] = []
+def test_build_runtime_passes_cli_values_to_service_context(monkeypatch):
+    service_context_calls: list[dict[str, object]] = []
 
-    monkeypatch.setattr(
-        main,
-        "resolve_provider_config",
-        lambda **_: SimpleNamespace(provider="openai", model_name="gpt-x"),
+    service_context = SimpleNamespace(
+        provider_config=SimpleNamespace(provider="openai", model_name="gpt-x"),
+        session_factory="session-factory:postgresql://env.example/app",
+        database_url="postgresql://env.example/app",
     )
-    monkeypatch.setenv("DATABASE_URL", "postgresql://env.example/app")
 
     class _FakeExecutionStore:
         def __init__(self, database_url: str, session_factory=None):
-            created["execution_store_url"] = database_url
-            created["execution_store_session_factory"] = session_factory
+            self.database_url = database_url
+            self.session_factory = session_factory
 
     monkeypatch.setattr(main, "ExecutionStore", _FakeExecutionStore)
     monkeypatch.setattr(
         main,
-        "create_session_factory",
-        lambda database_url: (
-            session_factory_calls.append(database_url)
-            or f"session-factory:{database_url}"
-        ),
+        "build_service_context",
+        lambda **kwargs: service_context_calls.append(kwargs) or service_context,
     )
     monkeypatch.setattr(main, "PlanRepository", lambda session_factory: None)
     monkeypatch.setattr(main, "PlanRunRepository", lambda session_factory: None)
@@ -202,11 +183,11 @@ def test_build_runtime_uses_database_url_from_env(monkeypatch):
         task=None,
         agent="run-plan",
         provider="openai",
-        model=None,
-        base_url=None,
-        thinking="default",
-        database_url=None,
-        runtime_config="config/runtime.json",
+        model="gpt-5-mini",
+        base_url="https://example.invalid/v1",
+        thinking="on",
+        database_url="postgresql://env.example/app",
+        runtime_config="config/custom.json",
         store_path="ignored-by-db-contract",
         plan_path="ignored-in-run-plan",
         plan_id="plan-123",
@@ -216,80 +197,14 @@ def test_build_runtime_uses_database_url_from_env(monkeypatch):
     runtime = main.build_runtime(args)
 
     assert runtime.plan_runner == "plan-runner"
-    assert created["execution_store_url"] == "postgresql://env.example/app"
-    assert session_factory_calls == ["postgresql://env.example/app"]
+    assert service_context_calls == [
+        {
+            "provider": "openai",
+            "model": "gpt-5-mini",
+            "base_url": "https://example.invalid/v1",
+            "thinking": "on",
+            "database_url": "postgresql://env.example/app",
+            "runtime_config": "config/custom.json",
+        }
+    ]
 
-
-def test_build_runtime_uses_database_url_from_runtime_json(monkeypatch):
-    created: dict[str, object] = {}
-    session_factory_calls: list[str] = []
-    runtime_config_calls: list[str] = []
-
-    monkeypatch.setattr(
-        main,
-        "resolve_provider_config",
-        lambda **_: SimpleNamespace(provider="openai", model_name="gpt-x"),
-    )
-    monkeypatch.delenv("DATABASE_URL", raising=False)
-    monkeypatch.setattr(
-        main,
-        "_load_runtime_config",
-        lambda path: (
-            runtime_config_calls.append(path)
-            or {"database_url": "postgresql://json.example/app"}
-        ),
-    )
-
-    class _FakeExecutionStore:
-        def __init__(self, database_url: str, session_factory=None):
-            created["execution_store_url"] = database_url
-            created["execution_store_session_factory"] = session_factory
-
-    monkeypatch.setattr(main, "ExecutionStore", _FakeExecutionStore)
-    monkeypatch.setattr(
-        main,
-        "create_session_factory",
-        lambda database_url: (
-            session_factory_calls.append(database_url)
-            or f"session-factory:{database_url}"
-        ),
-    )
-    monkeypatch.setattr(main, "PlanRepository", lambda session_factory: None)
-    monkeypatch.setattr(main, "PlanRunRepository", lambda session_factory: None)
-    monkeypatch.setattr(
-        main,
-        "_build_worker_agents",
-        lambda store, provider_config, thinking_mode: ("a", "i", "r"),
-    )
-    monkeypatch.setattr(
-        main,
-        "_build_dispatcher",
-        lambda analysis_agent, implementation_agent, review_agent: "dispatcher",
-    )
-    monkeypatch.setattr(
-        main,
-        "_build_plan_runner",
-        lambda **_: "plan-runner",
-    )
-
-    args = argparse.Namespace(
-        task=None,
-        agent="run-plan",
-        provider="openai",
-        model=None,
-        base_url=None,
-        thinking="default",
-        database_url=None,
-        runtime_config="config/runtime.json",
-        store_path="ignored-by-db-contract",
-        plan_path="ignored-in-run-plan",
-        plan_id="plan-123",
-        max_workers=1,
-    )
-
-    runtime = main.build_runtime(args)
-
-    assert runtime.plan_runner == "plan-runner"
-    assert created["execution_store_url"] == "postgresql://json.example/app"
-    assert session_factory_calls == ["postgresql://json.example/app"]
-    assert runtime_config_calls == ["config/runtime.json"]

@@ -104,6 +104,49 @@ class PlanRunRepository:
                 "ended_at": row.ended_at.isoformat() if row.ended_at else None,
             }
 
+    def get_run_summary(self, run_id: str) -> dict[str, object]:
+        return self.get_run(run_id)
+
+    def list_runs(self, limit: int = 20) -> list[dict[str, object]]:
+        with self._session_factory() as session:
+            rows = (
+                session.query(PlanRunRow)
+                .order_by(PlanRunRow.started_at.desc())
+                .limit(limit)
+                .all()
+            )
+            return [
+                {
+                    "run_id": str(row.run_id),
+                    "plan_id": str(row.plan_id),
+                    "max_workers": row.max_workers,
+                    "status": row.status,
+                    "started_at": row.started_at.isoformat(),
+                    "ended_at": row.ended_at.isoformat() if row.ended_at else None,
+                }
+                for row in rows
+            ]
+
+    def list_run_tasks(self, run_id: str) -> list[dict[str, object]]:
+        with self._session_factory() as session:
+            rows = (
+                session.query(PlanRunTaskRow)
+                .filter(PlanRunTaskRow.run_id == UUID(run_id))
+                .order_by(PlanRunTaskRow.updated_at.asc(), PlanRunTaskRow.task_id.asc())
+                .all()
+            )
+            return [
+                {
+                    "task_id": row.task_id,
+                    "agent_name": row.agent_name,
+                    "status": row.status,
+                    "execution_task_id": row.execution_task_id,
+                    "state_snapshot": dict(row.state_snapshot),
+                    "updated_at": row.updated_at.isoformat(),
+                }
+                for row in rows
+            ]
+
     def _parse_datetime_or_raise(self, value: str, field_name: str) -> datetime:
         cleaned = value.strip()
         if not cleaned:
