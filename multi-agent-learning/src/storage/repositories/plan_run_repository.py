@@ -15,6 +15,7 @@ class PlanRunRepository:
     def create_run(
         self,
         plan_id: str,
+        model_profile_id: str,
         max_workers: int,
         started_at: str,
     ) -> str:
@@ -28,6 +29,7 @@ class PlanRunRepository:
         with self._session_factory() as session:
             row = PlanRunRow(
                 plan_id=UUID(plan_id),
+                model_profile_id=UUID(model_profile_id),
                 max_workers=max_workers,
                 status=TASK_STATUS_RUNNING,
                 started_at=started_at_dt,
@@ -98,6 +100,7 @@ class PlanRunRepository:
             return {
                 "run_id": str(row.run_id),
                 "plan_id": str(row.plan_id),
+                "model_profile_id": str(row.model_profile_id),
                 "max_workers": row.max_workers,
                 "status": row.status,
                 "started_at": row.started_at.isoformat(),
@@ -119,6 +122,7 @@ class PlanRunRepository:
                 {
                     "run_id": str(row.run_id),
                     "plan_id": str(row.plan_id),
+                    "model_profile_id": str(row.model_profile_id),
                     "max_workers": row.max_workers,
                     "status": row.status,
                     "started_at": row.started_at.isoformat(),

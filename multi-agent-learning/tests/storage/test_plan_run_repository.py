@@ -2,13 +2,26 @@ from datetime import datetime, timezone
 
 import pytest
 
-from storage.db.models import ExecutionRow, PlanRow, PlanRunTaskRow
+from storage.db.models import ExecutionRow, ModelProfileRow, PlanRow, PlanRunTaskRow
 from storage.repositories.plan_run_repository import PlanRunRepository
 
 
 @pytest.mark.postgres
 def test_create_and_finish_run_roundtrip(db_session):
+    profile = ModelProfileRow(
+        name="Primary",
+        provider="openai",
+        model_name="gpt-5-mini",
+        base_url=None,
+        thinking_mode="default",
+        api_key_encrypted="cipher",
+        api_key_hint="****3456",
+    )
+    db_session.add(profile)
+    db_session.flush()
+
     plan = PlanRow(
+        model_profile_id=profile.model_profile_id,
         source_goal="goal",
         provider="openai",
         model_name="gpt-5-nano",
@@ -21,6 +34,7 @@ def test_create_and_finish_run_roundtrip(db_session):
     repo = PlanRunRepository(session_factory=lambda: db_session)
     run_id = repo.create_run(
         plan_id=plan_id,
+        model_profile_id=str(profile.model_profile_id),
         max_workers=2,
         started_at="2026-04-21T00:00:00+00:00",
     )
@@ -28,6 +42,7 @@ def test_create_and_finish_run_roundtrip(db_session):
     created = repo.get_run(run_id)
     assert created["status"] == "running"
     assert created["plan_id"] == plan_id
+    assert created["model_profile_id"] == str(profile.model_profile_id)
     assert created["max_workers"] == 2
     assert datetime.fromisoformat(created["started_at"]).astimezone(
         timezone.utc
@@ -49,7 +64,20 @@ def test_create_and_finish_run_roundtrip(db_session):
 
 @pytest.mark.postgres
 def test_upsert_task_state_updates_existing_row(db_session):
+    profile = ModelProfileRow(
+        name="Primary",
+        provider="openai",
+        model_name="gpt-5-mini",
+        base_url=None,
+        thinking_mode="default",
+        api_key_encrypted="cipher",
+        api_key_hint="****3456",
+    )
+    db_session.add(profile)
+    db_session.flush()
+
     plan = PlanRow(
+        model_profile_id=profile.model_profile_id,
         source_goal="goal",
         provider="openai",
         model_name="gpt-5-nano",
@@ -77,6 +105,7 @@ def test_upsert_task_state_updates_existing_row(db_session):
     repo = PlanRunRepository(session_factory=lambda: db_session)
     run_id = repo.create_run(
         plan_id=plan_id,
+        model_profile_id=str(profile.model_profile_id),
         max_workers=1,
         started_at="2026-04-21T00:00:00+00:00",
     )
@@ -110,3 +139,40 @@ def test_upsert_task_state_updates_existing_row(db_session):
     assert rows[0].status == "completed"
     assert rows[0].execution_task_id == "exec-1"
     assert rows[0].state_snapshot == {"task-1": "completed"}
+
+
+@pytest.mark.postgres
+def test_create_run_persists_model_profile_id(db_session):
+    profile = ModelProfileRow(
+        name="Primary",
+        provider="openai",
+        model_name="gpt-5-mini",
+        base_url=None,
+        thinking_mode="default",
+        api_key_encrypted="cipher",
+        api_key_hint="****3456",
+    )
+    db_session.add(profile)
+    db_session.flush()
+
+    plan = PlanRow(
+        model_profile_id=profile.model_profile_id,
+        source_goal="goal",
+        provider="openai",
+        model_name="gpt-5-mini",
+        thinking_mode="default",
+    )
+    db_session.add(plan)
+    db_session.commit()
+
+    repo = PlanRunRepository(session_factory=lambda: db_session)
+    run_id = repo.create_run(
+        plan_id=str(plan.plan_id),
+        model_profile_id=str(profile.model_profile_id),
+        max_workers=1,
+        started_at="2026-04-23T00:00:00+00:00",
+    )
+
+    summary = repo.get_run_summary(run_id)
+
+    assert summary["model_profile_id"] == str(profile.model_profile_id)

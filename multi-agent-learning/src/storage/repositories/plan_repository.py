@@ -14,6 +14,7 @@ class PlanRepository:
     def save_plan(
         self,
         goal: str,
+        model_profile_id: str,
         provider: str,
         model_name: str,
         thinking_mode: str,
@@ -21,6 +22,7 @@ class PlanRepository:
     ) -> str:
         with self._session_factory() as session:
             plan = PlanRow(
+                model_profile_id=UUID(model_profile_id),
                 source_goal=goal,
                 provider=provider,
                 model_name=model_name,
@@ -77,6 +79,7 @@ class PlanRepository:
             return [
                 {
                     "plan_id": str(row.plan_id),
+                    "model_profile_id": str(row.model_profile_id),
                     "source_goal": row.source_goal,
                     "provider": row.provider,
                     "model_name": row.model_name,
@@ -101,6 +104,7 @@ class PlanRepository:
             )
             return {
                 "plan_id": str(plan_row.plan_id),
+                "model_profile_id": str(plan_row.model_profile_id),
                 "source_goal": plan_row.source_goal,
                 "provider": plan_row.provider,
                 "model_name": plan_row.model_name,
