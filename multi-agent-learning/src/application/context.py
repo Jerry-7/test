@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from config import ModelProviderConfig, resolve_provider_config
+from security.secret_cipher import SecretCipher
 from storage.db.session import create_session_factory
 
 
@@ -15,6 +16,24 @@ class ServiceContext:
     thinking_mode: str
     database_url: str
     session_factory: object
+
+
+@dataclass(frozen=True)
+class AppContext:
+    database_url: str
+    session_factory: object
+    secret_cipher: SecretCipher
+
+
+@dataclass(frozen=True)
+class ResolvedModelProfile:
+    profile_id: str
+    name: str
+    provider: str
+    model_name: str
+    api_key: str
+    base_url: str | None
+    thinking_mode: str
 
 
 def _project_root() -> Path:
@@ -63,6 +82,33 @@ def _resolve_database_url(database_url: str | None, runtime_config: str | None) 
         return raw_config_database_url.strip()
 
     return ""
+
+
+def _resolve_app_secret_key(app_secret_key: str | None) -> str:
+    cleaned = (app_secret_key or "").strip()
+    if cleaned:
+        return cleaned
+
+    env_value = os.getenv("APP_SECRET_KEY", "").strip()
+    if env_value:
+        return env_value
+
+    raise ValueError("APP_SECRET_KEY is required for the operations console.")
+
+
+def build_app_context(
+    *,
+    database_url: str | None,
+    runtime_config: str | None,
+    app_secret_key: str | None,
+) -> AppContext:
+    resolved_database_url = _resolve_database_url(database_url, runtime_config)
+    session_factory = create_session_factory(resolved_database_url)
+    return AppContext(
+        database_url=resolved_database_url,
+        session_factory=session_factory,
+        secret_cipher=SecretCipher(_resolve_app_secret_key(app_secret_key)),
+    )
 
 
 def build_service_context(
