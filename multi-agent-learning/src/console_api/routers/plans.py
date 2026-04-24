@@ -13,7 +13,7 @@ def get_plan_service(request: Request):
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_plan(payload: CreatePlanRequest, service=Depends(get_plan_service)):
-    return service.create_plan(task=payload.task)
+    return service.create_plan(task=payload.task, profile_id=payload.profile_id)
 
 
 @router.get("")
@@ -24,4 +24,3 @@ def list_plans(service=Depends(get_plan_service)):
 @router.get("/{plan_id}")
 def get_plan(plan_id: str, service=Depends(get_plan_service)):
     return service.get_plan(plan_id)
-

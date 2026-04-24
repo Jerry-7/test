@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Body, Depends, Request, status
 from fastapi.responses import JSONResponse
 
-from console_api.schemas import StartRunRequest
+from console_api.schemas import RetryRunRequest, StartRunRequest
 
 router = APIRouter(prefix="/api/runs", tags=["runs"])
 
@@ -16,6 +16,7 @@ def get_run_service(request: Request):
 def start_run(payload: StartRunRequest, service=Depends(get_run_service)):
     return service.start_run(
         plan_id=payload.plan_id,
+        profile_id=payload.profile_id,
         max_workers=payload.max_workers,
     )
 
@@ -31,8 +32,12 @@ def get_run_detail(run_id: str, service=Depends(get_run_service)):
 
 
 @router.post("/{run_id}/retry", status_code=status.HTTP_201_CREATED)
-def retry_run(run_id: str, service=Depends(get_run_service)):
-    return service.retry_run(run_id)
+def retry_run(
+    run_id: str,
+    payload: RetryRunRequest = Body(default=RetryRunRequest()),
+    service=Depends(get_run_service),
+):
+    return service.retry_run(run_id, profile_id=payload.profile_id)
 
 
 @router.post("/{run_id}/pause")

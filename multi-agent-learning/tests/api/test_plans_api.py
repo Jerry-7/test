@@ -12,9 +12,10 @@ def test_post_plans_returns_created_plan():
         "PlanService",
         (),
         {
-            "create_plan": lambda self, task: {
+            "create_plan": lambda self, task, profile_id: {
                 "plan_id": "plan-123",
                 "source_goal": task,
+                "model_profile_id": profile_id,
                 "tasks": [],
             }
         },
@@ -23,8 +24,9 @@ def test_post_plans_returns_created_plan():
 
     response = client.post(
         "/api/plans",
-        json={"task": "learn multi-agent", "provider": "openai"},
+        json={"task": "learn multi-agent", "profile_id": "profile-1"},
     )
 
     assert response.status_code == 201
     assert response.json()["plan_id"] == "plan-123"
+    assert response.json()["model_profile_id"] == "profile-1"

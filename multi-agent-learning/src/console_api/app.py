@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from application.context import build_app_context
 from application.services import ModelProfileService, PlanService, RunService
-from console_api.routers import plans, runs
+from console_api.routers import model_profiles, plans, runs
 from main import build_plan_runner_for_profile, build_planner_agent_for_profile
 from storage.repositories import (
     ExecutionRepository,
@@ -55,6 +55,7 @@ def create_app() -> FastAPI:
     app.state.model_profile_service = None
     app.state.plan_service = None
     app.state.run_service = None
+    app.include_router(model_profiles.router)
     app.include_router(plans.router)
     app.include_router(runs.router)
 

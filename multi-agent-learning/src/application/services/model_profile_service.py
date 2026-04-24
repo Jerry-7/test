@@ -37,6 +37,36 @@ class ModelProfileService:
         )
         return self.get_profile(profile_id)
 
+    def update_profile(
+        self,
+        profile_id: str,
+        *,
+        name,
+        provider,
+        model_name,
+        base_url,
+        thinking_mode,
+        api_key,
+    ):
+        self._validate(
+            provider=provider,
+            thinking_mode=thinking_mode,
+            api_key=api_key,
+            name=name,
+            model_name=model_name,
+        )
+        self._repository.update_profile(
+            profile_id,
+            name=name.strip(),
+            provider=provider.strip().lower(),
+            model_name=model_name.strip(),
+            base_url=(base_url or "").strip() or None,
+            thinking_mode=thinking_mode,
+            api_key_encrypted=self._secret_cipher.encrypt(api_key),
+            api_key_hint=self._build_api_key_hint(api_key),
+        )
+        return self.get_profile(profile_id)
+
     def list_profiles(self) -> list[dict[str, object]]:
         return self._repository.list_profiles()
 
@@ -66,9 +96,26 @@ class ModelProfileService:
             thinking_mode=row["thinking_mode"],
         )
 
+    def delete_profile(self, profile_id: str) -> None:
+        self._repository.delete_profile(profile_id)
+
+    def duplicate_profile(self, profile_id: str) -> dict[str, object]:
+        profile = self.get_profile(profile_id)
+        return self.create_profile(
+            name=self._build_copy_name(profile["name"]),
+            provider=profile["provider"],
+            model_name=profile["model_name"],
+            base_url=profile["base_url"],
+            thinking_mode=profile["thinking_mode"],
+            api_key=profile["api_key"],
+        )
+
     def _build_api_key_hint(self, api_key: str) -> str:
         cleaned = api_key.strip()
         return f"****{cleaned[-4:]}" if len(cleaned) >= 4 else "****"
+
+    def _build_copy_name(self, name: str) -> str:
+        return f"{name.strip()} Copy"
 
     def _validate(
         self,

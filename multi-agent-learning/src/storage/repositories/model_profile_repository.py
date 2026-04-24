@@ -56,3 +56,24 @@ class ModelProfileRepository:
                 "api_key_encrypted": row.api_key_encrypted,
                 "updated_at": row.updated_at.isoformat(),
             }
+
+    def update_profile(self, profile_id: str, **kwargs) -> None:
+        with self._session_factory() as session:
+            row = (
+                session.query(ModelProfileRow)
+                .filter(ModelProfileRow.model_profile_id == UUID(profile_id))
+                .one()
+            )
+            for field_name, value in kwargs.items():
+                setattr(row, field_name, value)
+            session.commit()
+
+    def delete_profile(self, profile_id: str) -> None:
+        with self._session_factory() as session:
+            row = (
+                session.query(ModelProfileRow)
+                .filter(ModelProfileRow.model_profile_id == UUID(profile_id))
+                .one()
+            )
+            session.delete(row)
+            session.commit()
