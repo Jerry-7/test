@@ -2,6 +2,7 @@ import { NavLink, Route, Routes } from "react-router-dom";
 
 import AppShell from "./components/AppShell";
 import DashboardPage from "./routes/DashboardPage";
+import ModelProfilesPage from "./routes/ModelProfilesPage";
 import PlanDetailPage from "./routes/PlanDetailPage";
 import PlansPage from "./routes/PlansPage";
 import RunDetailPage from "./routes/RunDetailPage";
@@ -12,11 +13,13 @@ export default function App() {
     <AppShell>
       <nav aria-label="Primary">
         <NavLink to="/">Dashboard</NavLink>
+        <NavLink to="/model-profiles">Model Profiles</NavLink>
         <NavLink to="/plans">Plans</NavLink>
         <NavLink to="/runs">Runs</NavLink>
       </nav>
       <Routes>
         <Route path="/" element={<DashboardPage />} />
+        <Route path="/model-profiles" element={<ModelProfilesPage />} />
         <Route path="/plans" element={<PlansPage />} />
         <Route path="/plans/:planId" element={<PlanDetailPage />} />
         <Route path="/runs" element={<RunsPage />} />
