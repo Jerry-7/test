@@ -6,7 +6,10 @@ from application.context import build_service_context
 from agents.basic_agent import BasicAgent
 from agents.planner_agent import PlannerAgent
 from agents.worker_agents import AnalysisAgent, ImplementationAgent, ReviewAgent
-from config import ModelProviderConfig
+from config import (
+    ModelProviderConfig,
+    build_provider_config_from_runtime_profile,
+)
 from models.plan_constants import (
     TASK_TYPE_ANALYSIS,
     TASK_TYPE_DESIGN,
@@ -253,12 +256,14 @@ def _build_planner_agent(
     provider_config: ModelProviderConfig,
     thinking_mode: str,
     plan_repository: PlanRepository,
+    model_profile_id: str | None = None,
 ) -> PlannerAgent:
     """构建 planner 模式使用的规划 Agent。"""
     return PlannerAgent(
         provider_config=provider_config,
         thinking_mode=thinking_mode,
         plan_repository=plan_repository,
+        model_profile_id=model_profile_id,
     )
 
 
@@ -329,6 +334,48 @@ def _build_plan_runner(
         task_selection_policy=PriorityTaskSelectionPolicy(),
         batch_executor=batch_executor,
         max_workers=max_workers,
+    )
+
+
+def build_planner_agent_for_profile(profile, plan_repository: PlanRepository) -> PlannerAgent:
+    provider_config = build_provider_config_from_runtime_profile(profile)
+    return _build_planner_agent(
+        provider_config=provider_config,
+        thinking_mode=profile.thinking_mode,
+        plan_repository=plan_repository,
+        model_profile_id=profile.profile_id,
+    )
+
+
+def build_plan_runner_for_profile(
+    profile,
+    *,
+    database_url: str,
+    session_factory,
+    max_workers: int,
+    plan_repository: PlanRepository,
+    plan_run_repository: PlanRunRepository,
+) -> PlanRunner:
+    provider_config = build_provider_config_from_runtime_profile(profile)
+    store = ExecutionStore(
+        database_url=database_url,
+        session_factory=session_factory,
+    )
+    analysis_agent, implementation_agent, review_agent = _build_worker_agents(
+        store=store,
+        provider_config=provider_config,
+        thinking_mode=profile.thinking_mode,
+    )
+    dispatcher = _build_dispatcher(
+        analysis_agent=analysis_agent,
+        implementation_agent=implementation_agent,
+        review_agent=review_agent,
+    )
+    return _build_plan_runner(
+        dispatcher=dispatcher,
+        max_workers=max_workers,
+        plan_repository=plan_repository,
+        plan_run_repository=plan_run_repository,
     )
 
 

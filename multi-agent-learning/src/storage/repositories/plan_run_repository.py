@@ -5,7 +5,7 @@ from typing import Callable
 from uuid import UUID
 
 from models.plan_constants import TASK_STATUS_RUNNING
-from storage.db.models import PlanRunRow, PlanRunTaskRow
+from storage.db.models import ModelProfileRow, PlanRunRow, PlanRunTaskRow
 
 
 class PlanRunRepository:
@@ -92,8 +92,12 @@ class PlanRunRepository:
 
     def get_run(self, run_id: str) -> dict[str, object]:
         with self._session_factory() as session:
-            row = (
-                session.query(PlanRunRow)
+            row, profile_row = (
+                session.query(PlanRunRow, ModelProfileRow)
+                .join(
+                    ModelProfileRow,
+                    ModelProfileRow.model_profile_id == PlanRunRow.model_profile_id,
+                )
                 .filter(PlanRunRow.run_id == UUID(run_id))
                 .one()
             )
@@ -101,6 +105,9 @@ class PlanRunRepository:
                 "run_id": str(row.run_id),
                 "plan_id": str(row.plan_id),
                 "model_profile_id": str(row.model_profile_id),
+                "model_profile_name": profile_row.name,
+                "provider": profile_row.provider,
+                "model_name": profile_row.model_name,
                 "max_workers": row.max_workers,
                 "status": row.status,
                 "started_at": row.started_at.isoformat(),

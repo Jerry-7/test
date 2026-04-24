@@ -4,7 +4,7 @@ from typing import Callable
 from uuid import UUID
 
 from models.plan_task import PlanTask
-from storage.db.models import PlanRow, PlanTaskRow
+from storage.db.models import ModelProfileRow, PlanRow, PlanTaskRow
 
 
 class PlanRepository:
@@ -91,8 +91,12 @@ class PlanRepository:
 
     def get_plan_summary(self, plan_id: str) -> dict[str, object]:
         with self._session_factory() as session:
-            plan_row = (
-                session.query(PlanRow)
+            plan_row, profile_row = (
+                session.query(PlanRow, ModelProfileRow)
+                .join(
+                    ModelProfileRow,
+                    ModelProfileRow.model_profile_id == PlanRow.model_profile_id,
+                )
                 .filter(PlanRow.plan_id == UUID(plan_id))
                 .one()
             )
@@ -105,6 +109,7 @@ class PlanRepository:
             return {
                 "plan_id": str(plan_row.plan_id),
                 "model_profile_id": str(plan_row.model_profile_id),
+                "model_profile_name": profile_row.name,
                 "source_goal": plan_row.source_goal,
                 "provider": plan_row.provider,
                 "model_name": plan_row.model_name,
