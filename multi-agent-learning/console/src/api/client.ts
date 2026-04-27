@@ -62,6 +62,14 @@ export function getPlan(planId: string) {
   return readJson(`/plans/${planId}`);
 }
 
+export function createPlan(payload: { task: string; profile_id: string }) {
+  return readJson("/plans", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
 export function listRuns() {
   return readJson("/runs");
 }
@@ -70,8 +78,24 @@ export function getRunDetail(runId: string) {
   return readJson(`/runs/${runId}`);
 }
 
-export function retryRun(runId: string) {
-  return readJson(`/runs/${runId}/retry`, { method: "POST" });
+export function startRun(payload: {
+  plan_id: string;
+  profile_id: string;
+  max_workers: number;
+}) {
+  return readJson("/runs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+}
+
+export function retryRun(runId: string, payload?: { profile_id?: string }) {
+  return readJson(`/runs/${runId}/retry`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload ?? {}),
+  });
 }
 
 export async function requestRunControl(

@@ -1,19 +1,28 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { getRunDetail, retryRun } from "../api/client";
+import { getRunDetail, listModelProfiles, retryRun } from "../api/client";
 
 export default function RunDetailPage() {
   const { runId = "" } = useParams();
   const [detail, setDetail] = useState<any | null>(null);
+  const [profiles, setProfiles] = useState<any[]>([]);
+  const [retryProfileId, setRetryProfileId] = useState("");
 
   useEffect(() => {
     let alive = true;
 
     async function load() {
-      const next = await getRunDetail(runId);
+      const [next, nextProfiles] = await Promise.all([
+        getRunDetail(runId),
+        listModelProfiles(),
+      ]);
       if (alive) {
         setDetail(next);
+        setProfiles(nextProfiles);
+        setRetryProfileId(
+          next.model_profile_id ?? nextProfiles[0]?.model_profile_id ?? "",
+        );
       }
     }
 
@@ -32,7 +41,30 @@ export default function RunDetailPage() {
   return (
     <section>
       <h1>Run {detail.run_id}</h1>
-      <button onClick={() => void retryRun(runId)}>Retry run</button>
+      <p>
+        {detail.model_profile_name} - {detail.provider} - {detail.model_name}
+      </p>
+      <label>
+        Retry Profile
+        <select
+          aria-label="Retry Profile"
+          value={retryProfileId}
+          onChange={(event) => setRetryProfileId(event.target.value)}
+        >
+          {profiles.map((profile) => (
+            <option key={profile.model_profile_id} value={profile.model_profile_id}>
+              {profile.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
+        onClick={() =>
+          void retryRun(runId, { profile_id: retryProfileId })
+        }
+      >
+        Retry run
+      </button>
       <button disabled>Pause</button>
       <button disabled>Cancel</button>
       <ul>
