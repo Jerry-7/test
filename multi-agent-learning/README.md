@@ -30,7 +30,7 @@ copy .env.example .env
 
 ```bash
 set DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/multi_agent_learning
-set OPENAI_API_KEY=your_openai_api_key
+set APP_SECRET_KEY=replace_with_a_local_dev_secret
 ```
 
 6. 可选：也可以把配置写到 JSON（不想配环境变量时使用）
@@ -111,8 +111,13 @@ Start the API:
 
 ```bash
 set PYTHONPATH=src
+set DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/multi_agent_learning
+set APP_SECRET_KEY=replace_with_a_local_dev_secret
 py -3 -m uvicorn console_api.app:app --reload --port 8000
 ```
+
+The operations console can now boot without `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `DASHSCOPE_API_KEY`, or `ZAI_API_KEY`.
+Configure provider, model, base URL, thinking mode, and API key in the browser under `Model Profiles`.
 
 Start the UI:
 
@@ -123,6 +128,7 @@ cmd /c npm --prefix console run dev
 
 The console currently supports:
 
+- create, edit, duplicate, and delete model profiles
 - create plan
 - start run
 - inspect runs and task state
