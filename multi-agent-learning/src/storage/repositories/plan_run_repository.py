@@ -5,7 +5,7 @@ from typing import Callable
 from uuid import UUID
 
 from models.plan_constants import TASK_STATUS_RUNNING
-from storage.db.models import PlanRunRow, PlanRunTaskRow
+from storage.db.models import ModelProfileRow, PlanRunRow, PlanRunTaskRow
 
 
 class PlanRunRepository:
@@ -15,6 +15,7 @@ class PlanRunRepository:
     def create_run(
         self,
         plan_id: str,
+        model_profile_id: str,
         max_workers: int,
         started_at: str,
     ) -> str:
@@ -28,6 +29,7 @@ class PlanRunRepository:
         with self._session_factory() as session:
             row = PlanRunRow(
                 plan_id=UUID(plan_id),
+                model_profile_id=UUID(model_profile_id),
                 max_workers=max_workers,
                 status=TASK_STATUS_RUNNING,
                 started_at=started_at_dt,
@@ -90,19 +92,71 @@ class PlanRunRepository:
 
     def get_run(self, run_id: str) -> dict[str, object]:
         with self._session_factory() as session:
-            row = (
-                session.query(PlanRunRow)
+            row, profile_row = (
+                session.query(PlanRunRow, ModelProfileRow)
+                .join(
+                    ModelProfileRow,
+                    ModelProfileRow.model_profile_id == PlanRunRow.model_profile_id,
+                )
                 .filter(PlanRunRow.run_id == UUID(run_id))
                 .one()
             )
             return {
                 "run_id": str(row.run_id),
                 "plan_id": str(row.plan_id),
+                "model_profile_id": str(row.model_profile_id),
+                "model_profile_name": profile_row.name,
+                "provider": profile_row.provider,
+                "model_name": profile_row.model_name,
                 "max_workers": row.max_workers,
                 "status": row.status,
                 "started_at": row.started_at.isoformat(),
                 "ended_at": row.ended_at.isoformat() if row.ended_at else None,
             }
+
+    def get_run_summary(self, run_id: str) -> dict[str, object]:
+        return self.get_run(run_id)
+
+    def list_runs(self, limit: int = 20) -> list[dict[str, object]]:
+        with self._session_factory() as session:
+            rows = (
+                session.query(PlanRunRow)
+                .order_by(PlanRunRow.started_at.desc())
+                .limit(limit)
+                .all()
+            )
+            return [
+                {
+                    "run_id": str(row.run_id),
+                    "plan_id": str(row.plan_id),
+                    "model_profile_id": str(row.model_profile_id),
+                    "max_workers": row.max_workers,
+                    "status": row.status,
+                    "started_at": row.started_at.isoformat(),
+                    "ended_at": row.ended_at.isoformat() if row.ended_at else None,
+                }
+                for row in rows
+            ]
+
+    def list_run_tasks(self, run_id: str) -> list[dict[str, object]]:
+        with self._session_factory() as session:
+            rows = (
+                session.query(PlanRunTaskRow)
+                .filter(PlanRunTaskRow.run_id == UUID(run_id))
+                .order_by(PlanRunTaskRow.updated_at.asc(), PlanRunTaskRow.task_id.asc())
+                .all()
+            )
+            return [
+                {
+                    "task_id": row.task_id,
+                    "agent_name": row.agent_name,
+                    "status": row.status,
+                    "execution_task_id": row.execution_task_id,
+                    "state_snapshot": dict(row.state_snapshot),
+                    "updated_at": row.updated_at.isoformat(),
+                }
+                for row in rows
+            ]
 
     def _parse_datetime_or_raise(self, value: str, field_name: str) -> datetime:
         cleaned = value.strip()

@@ -37,6 +37,34 @@ class ExecutionRow(Base):
     )
 
 
+class ModelProfileRow(Base):
+    __tablename__ = "model_profiles"
+
+    model_profile_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    provider: Mapped[str] = mapped_column(String(64), nullable=False)
+    model_name: Mapped[str] = mapped_column(String(128), nullable=False)
+    base_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    thinking_mode: Mapped[str] = mapped_column(String(32), nullable=False)
+    api_key_encrypted: Mapped[str] = mapped_column(Text, nullable=False)
+    api_key_hint: Mapped[str] = mapped_column(String(32), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
 class PlanRow(Base):
     __tablename__ = "plans"
 
@@ -44,6 +72,11 @@ class PlanRow(Base):
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
+    )
+    model_profile_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("model_profiles.model_profile_id", ondelete="RESTRICT"),
+        nullable=False,
     )
     source_goal: Mapped[str] = mapped_column(Text, nullable=False)
     provider: Mapped[str] = mapped_column(String(64), nullable=False)
@@ -83,6 +116,11 @@ class PlanRunRow(Base):
     plan_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("plans.plan_id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    model_profile_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("model_profiles.model_profile_id", ondelete="RESTRICT"),
         nullable=False,
     )
     max_workers: Mapped[int] = mapped_column(Integer, nullable=False)

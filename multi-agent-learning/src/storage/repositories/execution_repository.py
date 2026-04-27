@@ -62,6 +62,33 @@ class ExecutionRepository:
                 for row in rows
             ]
 
+    def load_by_task_ids(self, task_ids: list[str]) -> list[TaskExecutionRecord]:
+        if not task_ids:
+            return []
+
+        with self._session_factory() as session:
+            rows = (
+                session.query(ExecutionRow)
+                .filter(ExecutionRow.task_id.in_(task_ids))
+                .order_by(ExecutionRow.created_at.asc())
+                .all()
+            )
+            return [
+                {
+                    "task_id": row.task_id,
+                    "task_text": row.task_text,
+                    "agent_name": row.agent_name,
+                    "status": row.status,
+                    "output": row.output,
+                    "error": row.error,
+                    "traceback": row.traceback,
+                    "started_at": row.started_at.isoformat(),
+                    "ended_at": row.ended_at.isoformat(),
+                    "metadata": row.metadata_json,
+                }
+                for row in rows
+            ]
+
     def _parse_datetime_or_raise(self, value: str, field_name: str) -> datetime:
         cleaned = value.strip()
         if not cleaned:

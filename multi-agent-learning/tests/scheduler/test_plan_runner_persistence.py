@@ -135,3 +135,22 @@ def test_run_from_plan_id_marks_failed_when_executor_errors():
     assert len(run_repo.created) == 1
     assert run_repo.upserts == []
     assert run_repo.finished[-1]["status"] == "failed"
+
+
+def test_run_from_plan_id_reuses_explicit_run_id():
+    plan_repo = _FakePlanRepository(tasks=_single_task_plan())
+    run_repo = _FakePlanRunRepository()
+    runner = PlanRunner(
+        dispatcher=Dispatcher(),
+        plan_validator=PlanValidator(),
+        plan_repository=plan_repo,
+        plan_run_repository=run_repo,
+        batch_executor=_CompletedBatchExecutor(),
+    )
+
+    executions = runner.run_from_plan_id("plan-1", run_id="run-existing")
+
+    assert len(executions) == 1
+    assert run_repo.created == []
+    assert run_repo.upserts[0]["run_id"] == "run-existing"
+    assert run_repo.finished[-1]["run_id"] == "run-existing"

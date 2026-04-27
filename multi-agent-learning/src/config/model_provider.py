@@ -156,6 +156,25 @@ def resolve_provider_config(
     )
 
 
+def build_provider_config_from_runtime_profile(profile) -> ModelProviderConfig:
+    normalized = profile.provider.strip().lower()
+    if normalized not in PROVIDER_PRESETS:
+        supported = ", ".join(get_supported_providers())
+        raise ValueError(
+            f"Unsupported provider: {profile.provider}. Supported providers: {supported}."
+        )
+
+    preset = PROVIDER_PRESETS[normalized]
+    return ModelProviderConfig(
+        provider=normalized,
+        model_name=profile.model_name,
+        api_key=profile.api_key,
+        base_url=profile.base_url or preset.default_base_url,
+        api_key_env="MODEL_PROFILE",
+        default_headers=_build_default_headers(normalized),
+    )
+
+
 def _build_default_headers(provider: str) -> dict[str, str]:
     """构建 provider 级别的可选请求头。"""
 

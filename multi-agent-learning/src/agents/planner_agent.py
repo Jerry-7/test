@@ -26,11 +26,13 @@ class PlannerAgent:
         provider_config: ModelProviderConfig,
         thinking_mode: str = "default",
         plan_repository: PlanRepository | None = None,
+        model_profile_id: str | None = None,
     ):
         self.name = "PlannerAgent"
         self.provider_config = provider_config
         self.thinking_mode = thinking_mode
         self.plan_repository = plan_repository or self._build_default_plan_repository()
+        self.model_profile_id = model_profile_id
         self.system_prompt = (
             "你是一个计划者。"
             "请把用户的任务拆成 1 到 5 个清晰、循序渐进的任务。"
@@ -61,10 +63,13 @@ class PlannerAgent:
         cleaned_goal = goal.strip()
         if not cleaned_goal:
             raise ValueError("Goal cannot be empty.")
+        if not self.model_profile_id:
+            raise RuntimeError("PlannerAgent requires model_profile_id in console mode.")
 
         plan = self._handle_goal(cleaned_goal)
         plan_id = self.plan_repository.save_plan(
             goal=cleaned_goal,
+            model_profile_id=self.model_profile_id,
             provider=self.provider_config.provider,
             model_name=self.provider_config.model_name,
             thinking_mode=self.thinking_mode,

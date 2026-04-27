@@ -1,14 +1,15 @@
 import argparse
-import json
-import os
 import sys
 from dataclasses import dataclass
-from pathlib import Path
 
+from application.context import build_service_context
 from agents.basic_agent import BasicAgent
 from agents.planner_agent import PlannerAgent
 from agents.worker_agents import AnalysisAgent, ImplementationAgent, ReviewAgent
-from config import ModelProviderConfig, resolve_provider_config
+from config import (
+    ModelProviderConfig,
+    build_provider_config_from_runtime_profile,
+)
 from models.plan_constants import (
     TASK_TYPE_ANALYSIS,
     TASK_TYPE_DESIGN,
@@ -24,7 +25,6 @@ from scheduler.plan_runner import PlanRunner
 from scheduler.plan_validator import PlanValidator
 from scheduler.task_selection_policy import PriorityTaskSelectionPolicy
 from models.task import TaskExecution
-from storage.db.session import create_session_factory
 from storage.execution_store import ExecutionStore
 from storage.repositories.plan_repository import PlanRepository
 from storage.repositories.plan_run_repository import PlanRunRepository
@@ -256,12 +256,14 @@ def _build_planner_agent(
     provider_config: ModelProviderConfig,
     thinking_mode: str,
     plan_repository: PlanRepository,
+    model_profile_id: str | None = None,
 ) -> PlannerAgent:
     """构建 planner 模式使用的规划 Agent。"""
     return PlannerAgent(
         provider_config=provider_config,
         thinking_mode=thinking_mode,
         plan_repository=plan_repository,
+        model_profile_id=model_profile_id,
     )
 
 
@@ -335,61 +337,46 @@ def _build_plan_runner(
     )
 
 
-def _load_runtime_config(config_path: str | None) -> dict:
-    cleaned = (config_path or "").strip()
-    if not cleaned:
-        return {}
-
-    raw_path = Path(cleaned)
-    if raw_path.is_absolute():
-        resolved_path = raw_path
-    else:
-        cwd_candidate = Path.cwd() / raw_path
-        if cwd_candidate.exists():
-            resolved_path = cwd_candidate
-        else:
-            project_root = Path(__file__).resolve().parents[1]
-            resolved_path = project_root / raw_path
-
-    if not resolved_path.exists():
-        return {}
-
-    content = resolved_path.read_text(encoding="utf-8").strip()
-    if not content:
-        return {}
-
-    data = json.loads(content)
-    if not isinstance(data, dict):
-        raise ValueError("runtime config must be a JSON object.")
-    return data
-
-
-def _resolve_database_url(
-    database_url: str | None,
-    runtime_config_path: str | None = None,
-) -> str:
-    cleaned_database_url = (database_url or "").strip()
-    if cleaned_database_url:
-        return cleaned_database_url
-
-    env_database_url = os.getenv("DATABASE_URL", "").strip()
-    if env_database_url:
-        return env_database_url
-
-    runtime_config = _load_runtime_config(runtime_config_path)
-    raw_config_database_url = (
-        runtime_config.get("database_url")
-        or runtime_config.get("DATABASE_URL")
+def build_planner_agent_for_profile(profile, plan_repository: PlanRepository) -> PlannerAgent:
+    provider_config = build_provider_config_from_runtime_profile(profile)
+    return _build_planner_agent(
+        provider_config=provider_config,
+        thinking_mode=profile.thinking_mode,
+        plan_repository=plan_repository,
+        model_profile_id=profile.profile_id,
     )
-    config_database_url = (
-        raw_config_database_url.strip()
-        if isinstance(raw_config_database_url, str)
-        else ""
-    )
-    if config_database_url:
-        return config_database_url
 
-    return ""
+
+def build_plan_runner_for_profile(
+    profile,
+    *,
+    database_url: str,
+    session_factory,
+    max_workers: int,
+    plan_repository: PlanRepository,
+    plan_run_repository: PlanRunRepository,
+) -> PlanRunner:
+    provider_config = build_provider_config_from_runtime_profile(profile)
+    store = ExecutionStore(
+        database_url=database_url,
+        session_factory=session_factory,
+    )
+    analysis_agent, implementation_agent, review_agent = _build_worker_agents(
+        store=store,
+        provider_config=provider_config,
+        thinking_mode=profile.thinking_mode,
+    )
+    dispatcher = _build_dispatcher(
+        analysis_agent=analysis_agent,
+        implementation_agent=implementation_agent,
+        review_agent=review_agent,
+    )
+    return _build_plan_runner(
+        dispatcher=dispatcher,
+        max_workers=max_workers,
+        plan_repository=plan_repository,
+        plan_run_repository=plan_run_repository,
+    )
 
 
 def build_runtime(args: argparse.Namespace) -> RuntimeContext:
@@ -400,16 +387,17 @@ def build_runtime(args: argparse.Namespace) -> RuntimeContext:
     - planner: 初始化 Worker + Dispatcher + PlannerAgent
     - run-plan: 初始化 Worker + Dispatcher + PlanRunner
     """
-    provider_config = resolve_provider_config(
+    service_context = build_service_context(
         provider=args.provider,
-        model_name=args.model,
+        model=args.model,
         base_url=args.base_url,
+        thinking=args.thinking,
+        database_url=args.database_url,
+        runtime_config=getattr(args, "runtime_config", None),
     )
-    database_url = _resolve_database_url(
-        args.database_url,
-        getattr(args, "runtime_config", None),
-    )
-    session_factory = create_session_factory(database_url)
+    provider_config = service_context.provider_config
+    session_factory = service_context.session_factory
+    database_url = service_context.database_url
 
     store = ExecutionStore(
         database_url=database_url,
