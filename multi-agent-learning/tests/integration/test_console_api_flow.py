@@ -65,3 +65,30 @@ def test_console_api_wires_services_on_startup(monkeypatch):
         response = client.get("/api/runs")
 
     assert response.status_code == 200
+
+
+def test_console_api_handles_cors_preflight_for_model_profiles(monkeypatch):
+    monkeypatch.setattr(
+        "console_api.app.build_app_context",
+        lambda **_: object(),
+    )
+    monkeypatch.setattr(
+        "console_api.app._build_services",
+        lambda ctx: {
+            "model_profile_service": object(),
+            "plan_service": object(),
+            "run_service": object(),
+        },
+    )
+
+    with TestClient(create_app()) as client:
+        response = client.options(
+            "/api/model-profiles",
+            headers={
+                "Origin": "http://127.0.0.1:5173",
+                "Access-Control-Request-Method": "POST",
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:5173"

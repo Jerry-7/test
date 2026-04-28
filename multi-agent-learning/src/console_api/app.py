@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from application.context import build_app_context
 from application.services import ModelProfileService, PlanService, RunService
@@ -52,6 +53,15 @@ def _build_services(ctx) -> dict[str, object]:
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Multi-Agent Learning Console API")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://127.0.0.1:5173",
+            "http://localhost:5173",
+        ],
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     app.state.model_profile_service = None
     app.state.plan_service = None
     app.state.run_service = None
