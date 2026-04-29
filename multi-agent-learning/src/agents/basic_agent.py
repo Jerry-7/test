@@ -36,7 +36,7 @@ class BasicAgent(BaseAgent):
     """
 
     DEFAULT_SYSTEM_PROMPT = (
-        "你是一个帮助用户学习多 Agent 调度的 Python 学习助手。"
+        "你是一个帮助用户的助手。"
         "请用清晰、结构化、适合初学者的方式回答。"
         "优先解释任务目标、关键组成、执行流程和下一步建议。"
     )
