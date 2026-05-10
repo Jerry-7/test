@@ -1,0 +1,170 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="第 1 页" id="qhhWimODyfSlva-5PY7c">
+    <mxGraphModel dx="906" dy="545" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-5" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-12" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="main" vertex="1">
+          <mxGeometry height="60" width="120" x="80" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-7" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="120" x="230" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-3" parent="dHjvfN53NLoZeKB3Dlaw-7" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;build_runtime&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-6" parent="dHjvfN53NLoZeKB3Dlaw-7" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="2.构建运行时" vertex="1">
+          <mxGeometry height="30" width="80" x="20" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-9" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="120" x="230" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-10" parent="dHjvfN53NLoZeKB3Dlaw-9" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;_run_init_db&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-11" parent="dHjvfN53NLoZeKB3Dlaw-9" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="1.初始数据库" vertex="1">
+          <mxGeometry height="30" width="80" x="20" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-13" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="90" width="190" x="450" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-14" parent="dHjvfN53NLoZeKB3Dlaw-13" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;build_service_context&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="190" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-17" parent="dHjvfN53NLoZeKB3Dlaw-13" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="构建模型配置、数据库配置对象" vertex="1">
+          <mxGeometry height="30" width="170" x="13" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-19" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;resolve_provider_config&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="180" x="700" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;_resolve_database_url&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="180" x="700" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-22" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="dHjvfN53NLoZeKB3Dlaw-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-23" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="dHjvfN53NLoZeKB3Dlaw-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;create_session_factory&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="180" x="700" y="524.5" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-25" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="dHjvfN53NLoZeKB3Dlaw-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-27" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="模型配置" vertex="1">
+          <mxGeometry height="30" width="60" x="760" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-28" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="解析数据库url" vertex="1">
+          <mxGeometry height="30" width="80" x="750" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-29" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="构建数据库session工厂对象" vertex="1">
+          <mxGeometry height="30" width="160" x="720" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-30" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-31" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="140" width="270" x="430" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-32" parent="dHjvfN53NLoZeKB3Dlaw-31" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(210, 168, 255);&quot;&gt;初始化basic、planner、runner agent&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="270" x="-37" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-33" parent="dHjvfN53NLoZeKB3Dlaw-31" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="构建模型配置、数据库配置对象" vertex="1">
+          <mxGeometry height="30" width="170" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-34" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;_build_basic_agent&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="180" x="830" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-35" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="dHjvfN53NLoZeKB3Dlaw-34">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="695" />
+              <mxPoint x="750" y="680" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-36" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="basic模式" vertex="1">
+          <mxGeometry height="30" width="60" x="760" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-37" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="通过provider_config 构建basic agnet并返回" vertex="1">
+          <mxGeometry height="30" width="180" x="830" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-45" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-43">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-46" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-52" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-38" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;font color=&quot;#67438e&quot;&gt;构建dispatcher&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="870" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-40" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="plan模式" vertex="1">
+          <mxGeometry height="30" width="60" x="760" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-54" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-43" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;font color=&quot;#67438e&quot;&gt;构建planner&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="213" x="1170" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-57" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="dHjvfN53NLoZeKB3Dlaw-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-44" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;font color=&quot;#67438e&quot;&gt;构建runner&lt;/font&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="213" x="1170" y="900" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-47" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="plan" vertex="1">
+          <mxGeometry height="30" width="60" x="1110" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-48" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="run" vertex="1">
+          <mxGeometry height="30" width="60" x="1110" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-50" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="dHjvfN53NLoZeKB3Dlaw-38">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="695" />
+              <mxPoint x="750" y="875" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-51" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;" value="&lt;div style=&quot;text-align: justify; background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); background-color: rgb(18, 19, 20);&quot;&gt;注册AnalysisAgent&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify; background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); background-color: rgb(18, 19, 20);&quot;&gt;ImplementationAgent&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); background-color: rgb(18, 19, 20);&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(78, 201, 176), rgb(6, 112, 90)); background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222));&quot;&gt;ReviewAgent&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;color: rgb(78, 201, 176);&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(78, 201, 176), rgb(6, 112, 90)); background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222));&quot;&gt;并根据任务类型registerg对应agent&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="236.5" x="851.75" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-53" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;_build_planner_agent&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="213" x="1450" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-55" parent="1" style="text;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 19px; white-space: pre;&quot;&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="170" x="1480" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-68" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=none;endFill=0;" target="dHjvfN53NLoZeKB3Dlaw-58">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-56" parent="1" style="rounded=1;whiteSpace=wrap;html=1;align=center;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(103, 67, 142), rgb(188, 157, 222)); background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222));&quot;&gt;_build_plan_runner:&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;color: rgb(103, 67, 142);&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(103, 67, 142), rgb(188, 157, 222)); background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222));&quot;&gt;1.dispatcher&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify; background-color: rgb(18, 19, 20); line-height: 19px; color: rgb(187, 190, 191);&quot;&gt;&lt;span style=&quot;background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222));&quot;&gt;&lt;font color=&quot;#bc9dde&quot;&gt;2.&lt;/font&gt;&lt;/span&gt;&lt;span style=&quot;color: light-dark(rgb(78, 201, 176), rgb(6, 112, 90)); background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222));&quot;&gt;PlanTaskRenderer&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: light-dark(rgb(18, 19, 20), rgb(220, 221, 222)); color: light-dark(rgb(78, 201, 176), rgb(6, 112, 90));&quot;&gt;3.根据workers数量 -&amp;gt;&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;color: rgb(78, 201, 176); background-color: rgb(18, 19, 20);&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: rgb(18, 19, 20); color: rgb(78, 201, 176);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;background-color: rgb(18, 19, 20); color: rgb(78, 201, 176);&quot;&gt;ThreadPoolBatchExecutor&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify; color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176); background-color: rgb(18, 19, 20);&quot;&gt; or&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: rgb(18, 19, 20); color: rgb(78, 201, 176);&quot;&gt; &lt;/span&gt;&lt;span style=&quot;background-color: rgb(18, 19, 20); color: rgb(78, 201, 176);&quot;&gt;SerialBatchExecutor&lt;/span&gt;&lt;/div&gt;&lt;span style=&quot;color: rgb(78, 201, 176); background-color: rgb(18, 19, 20);&quot;&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: rgb(18, 19, 20); color: rgb(78, 201, 176);&quot;&gt;4.&lt;/span&gt;&lt;span style=&quot;background-color: rgb(18, 19, 20); color: rgb(78, 201, 176);&quot;&gt;PlanValidator()&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="170" width="220" x="1450" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-58" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;div style=&quot;text-align: justify; color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(210, 168, 255);&quot;&gt;PlanTaskRender&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify; color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(210, 168, 255);&quot;&gt;1.build():planTask -&amp;gt; agentTask&lt;br&gt;2.&lt;/span&gt;&lt;span style=&quot;color: rgb(210, 168, 255); background-color: rgb(18, 19, 20); text-align: center;&quot;&gt;_build_dag_summary():&lt;br&gt;  &lt;/span&gt;&lt;span style=&quot;color: rgb(165, 214, 255); background-color: rgb(18, 19, 20); text-align: center;&quot;&gt;生成简化的 DAG 结构摘要，标记当前&lt;br&gt;任务位置。(task.id,task.type,deps)&lt;br/&gt;3.&lt;/span&gt;&lt;span style=&quot;color: rgb(210, 168, 255); background-color: rgb(18, 19, 20); text-align: center;&quot;&gt;_build_upstream_context():&lt;br/&gt;构建前置deps任务中的输出，并通过&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify; color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(210, 168, 255); background-color: rgb(18, 19, 20); text-align: center;&quot;&gt;_count_tokens和&lt;br/&gt;&lt;/span&gt;&lt;span style=&quot;color: rgb(210, 168, 255); background-color: rgb(18, 19, 20); text-align: center;&quot;&gt;_truncate_by_tokens截取前置任务的输&lt;br/&gt;出，以防止上下文爆炸&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="225" width="270" x="1770" y="855" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-67" edge="1" parent="1" source="dHjvfN53NLoZeKB3Dlaw-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="dHjvfN53NLoZeKB3Dlaw-58">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-64" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="把PlanTask -&amp;gt; AgentTask" vertex="1">
+          <mxGeometry height="30" width="150" x="1790" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="dHjvfN53NLoZeKB3Dlaw-69" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;div style=&quot;background-color: rgb(18, 19, 20); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 14px; line-height: 19px; white-space: pre; color: rgb(187, 190, 191);&quot;&gt;&lt;div style=&quot;text-align: justify; color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;T&lt;span style=&quot;color: rgb(78, 201, 176);&quot;&gt;hreadPoolBatchExecutor:&lt;br&gt;dispatcher、task_render&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176);&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: rgb(78, 201, 176);&quot;&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;1._execute_one_task():&lt;br/&gt;-&amp;gt; PlanTask,upstream_outputs,&lt;br/&gt;original_goal&lt;br/&gt;&lt;br/&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;span style=&quot;color: #d2a8ff;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify; color: rgb(187, 190, 191); background-color: rgb(18, 19, 20); line-height: 19px;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="225" width="270" x="2240" y="810" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
